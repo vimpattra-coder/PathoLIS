@@ -133,15 +133,20 @@ st.markdown("---")
 header_col, search_col1, search_col2 = st.columns([2, 1.5, 1.5])
 
 with header_col:
-    st.subheader("📋 รายการสิ่งส่งตรวจทั้งหมด")
+    st.subheader("📄 รายการสิ่งส่งตรวจทั้งหมด")
 
 with search_col1:
-    search_query = st.text_input("🔍 ค้นหา (SN/HN):", placeholder="พิมพ์เพื่อค้นหา...", label_visibility="collapsed")
+    # 📝 ปรับแสดงคำใบ้ให้ครอบคลุมการค้นหาด้วยชื่อ
+    search_query = st.text_input(
+        "🔍 ค้นหา (เลขเคส/HN/ชื่อ):", 
+        placeholder="พิมพ์ เลขเคส, HN หรือชื่อผู้ป่วย...", 
+        label_visibility="collapsed"
+    )
 
 with search_col2:
     date_range = st.date_input(
         "📅 ค้นหาวันที่รับเนื้อ:",
-        value=None, # ค่าเริ่มต้นเป็นว่างเปล่า จะได้ไม่จำกัดวันที่ถ้าไม่ได้เลือก
+        value=None,
         format="DD/MM/YYYY",
         label_visibility="collapsed"
     )
@@ -149,11 +154,7 @@ with search_col2:
 # ==============================================================================
 # 3.1 เตรียมข้อมูล
 # ==============================================================================
-
-df["วันที่กดทิ้ง_temp"] = pd.to_datetime(
-    df["วันที่กดทิ้ง"],
-    errors="coerce"
-)
+df["วันที่กดทิ้ง_temp"] = pd.to_datetime(df["วันที่กดทิ้ง"], errors="coerce")
 
 mask_threw = (df["การทิ้งชิ้นเนื้อ"] == "ทิ้งแล้ว")
 
@@ -199,6 +200,12 @@ if search_query:
         )
         |
         search_df["HN"].astype(str).str.contains(
+            search_query,
+            case=False,
+            na=False
+        )
+        |
+        search_df["ชื่อผู้ป่วย"].astype(str).str.contains(
             search_query,
             case=False,
             na=False
